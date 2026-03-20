@@ -78,10 +78,75 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-### Build
+### Build for Production
 
 ```bash
 npm run build
+npm start
+```
+
+## Project Structure
+
+```
+lankanbook/
+├── app/
+│   ├── api/                      # Backend API routes
+│   │   ├── establishments/     # GET/POST establishments, GET by ID, upvote
+│   │   ├── reports/            # GET/POST testimonies
+│   │   └── upload/             # Media file uploads
+│   ├── establishment/[id]/    # Individual establishment page
+│   ├── submit/                 # Submit new report page
+│   ├── about/                  # About page
+│   ├── page.tsx               # Homepage
+│   └── layout.tsx             # Root layout with fonts
+├── components/
+│   ├── media/                  # MediaUploader, MediaGallery
+│   ├── site-footer.tsx        # Shared footer
+│   └── ui/                    # shadcn/ui components
+├── hooks/
+│   └── use-tracker.ts        # localStorage-based submission/upvote tracking
+├── lib/
+│   ├── db/                    # Database connection & schema
+│   ├── types.ts               # TypeScript type definitions
+│   └── utils.ts               # Utility functions
+└── drizzle/                   # Database migrations
+```
+
+## Contributing
+
+We welcome contributions from developers, designers, and Sri Lankan community members.
+
+### Ways to Contribute
+
+- **Bug Reports** — Found a bug? Open an issue with steps to reproduce
+- **Feature Suggestions** — Have an idea to improve the platform? We'd love to hear it
+- **Code Contributions** — Fix bugs, improve performance, add features
+- **UI/UX Improvements** — Help us make the experience better for mobile users
+- **Documentation** — Improve docs, add examples, fix typos
+
+### Development Workflow
+
+1. **Fork** the repository
+2. **Clone** your fork: `git clone https://github.com/YOUR_USERNAME/lankanbook.git`
+3. **Create a branch** for your changes: `git checkout -b feature/your-feature-name`
+4. **Make your changes** and commit with clear messages
+5. **Push** to your fork: `git push origin feature/your-feature-name`
+6. **Open a Pull Request** against `main`
+
+### Code Style
+
+We use:
+
+- ESLint for TypeScript/React
+- Prettier for code formatting
+- Tailwind CSS for styling
+
+Run before committing:
+
+```bash
+npm run lint
+npm run format
+npm run typecheck
 ```
 
 ## Database Schema
