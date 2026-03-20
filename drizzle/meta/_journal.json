@@ -8,6 +8,13 @@
       "when": 1773994629976,
       "tag": "0000_ancient_logan",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773995236218,
+      "tag": "0001_nosy_wendigo",
+      "breakpoints": true
     }
   ]
 }
