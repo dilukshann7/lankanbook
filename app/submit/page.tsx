@@ -19,15 +19,10 @@ const PROVINCES = [
   "Sabaragamuwa Province",
 ]
 
-interface MediaItem {
-  url: string
-  type: "image" | "video"
-}
-
 export default function SubmitPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [mediaUrls, setMediaUrls] = useState<MediaItem[]>([])
+  const [mediaUrls, setMediaUrls] = useState<Media[]>([])
   const [formData, setFormData] = useState({
     name: "",
     location: "",
@@ -35,10 +30,18 @@ export default function SubmitPage() {
     description: "",
   })
 
+  const set =
+    (k: string) =>
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >
+    ) =>
+      setFormData((f) => ({ ...f, [k]: e.target.value }))
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
     try {
       const res = await fetch("/api/establishments", {
         method: "POST",
@@ -48,10 +51,9 @@ export default function SubmitPage() {
           mediaUrls: mediaUrls.map((m) => m.url),
         }),
       })
-
       if (res.ok) {
-        const establishment = await res.json()
-        router.push(`/establishment/${establishment.id}`)
+        const d = await res.json()
+        router.push(`/establishment/${d.id}`)
       }
     } catch {
       console.error("Failed to submit")
@@ -60,141 +62,214 @@ export default function SubmitPage() {
     }
   }
 
+  const inputClass = `font-playfair w-full border border-amber-200 bg-white px-3 py-2.5 text-sm text-stone-800
+    placeholder:text-stone-400 placeholder:italic focus:outline-none focus:border-amber-500
+    transition-colors`
+
+  const labelClass = `font-mono-dm block text-[10px] tracking-widest text-amber-700 uppercase mb-1.5`
+
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                Report Establishment
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Submit a new report
-              </p>
-            </div>
+    <div className="font-playfair min-h-screen bg-amber-50 text-stone-900">
+      <header
+        className="bg-stone-900"
+        style={{ borderBottom: "4px double #b45309" }}
+      >
+        <div className="mx-auto max-w-4xl px-4 sm:px-6">
+          <div className="font-mono-dm flex items-center gap-2 border-b border-stone-700 py-3 text-[10px] tracking-widest text-amber-600/70 uppercase">
+            <Link href="/" className="transition-colors hover:text-amber-400">
+              LankanBook
+            </Link>
+            <span className="text-stone-600">›</span>
+            <span className="text-amber-300">File a Report</span>
+          </div>
+          <div className="py-6">
+            <p className="font-mono-dm mb-2 text-[10px] tracking-[0.3em] text-amber-600/60 uppercase">
+              Community Record
+            </p>
+            <h1 className="font-playfair text-4xl leading-tight font-black text-amber-50 sm:text-5xl">
+              Report an Establishment
+            </h1>
+            <p className="mt-2 text-xs text-amber-700/70 italic">
+              Help the community make informed decisions about where to spend
+              their money.
+            </p>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto max-w-2xl px-4 py-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Report an Establishment</CardTitle>
-            <CardDescription>
-              Help others by reporting establishments that discriminate against
-              locals. Please provide accurate information and any proof you
-              have.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">Establishment Name *</Label>
-                <Input
-                  id="name"
-                  placeholder="e.g., Casa Mia"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
+      <main className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+        <div className="grid gap-8 lg:grid-cols-3">
+          <form onSubmit={handleSubmit} className="space-y-6 lg:col-span-2">
+            <div>
+              <label htmlFor="name" className={labelClass}>
+                Establishment Name *
+              </label>
+              <input
+                id="name"
+                required
+                className={inputClass}
+                placeholder="e.g., Casa Mia"
+                value={formData.name}
+                onChange={set("name")}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="location">Location *</Label>
-                <Input
-                  id="location"
-                  placeholder="e.g., Hikkaduwa"
-                  value={formData.location}
-                  onChange={(e) =>
-                    setFormData({ ...formData, location: e.target.value })
-                  }
-                  required
-                />
-              </div>
+            <div>
+              <label htmlFor="location" className={labelClass}>
+                Location *
+              </label>
+              <input
+                id="location"
+                required
+                className={inputClass}
+                placeholder="e.g., Hikkaduwa"
+                value={formData.location}
+                onChange={set("location")}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="province">Province *</Label>
-                <select
-                  id="province"
-                  value={formData.province}
-                  onChange={(e) =>
-                    setFormData({ ...formData, province: e.target.value })
-                  }
-                  required
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
-                >
-                  <option value="">Select a province</option>
-                  {provinces.map((province) => (
-                    <option key={province} value={province}>
-                      {province}
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label htmlFor="province" className={labelClass}>
+                Province *
+              </label>
+              <select
+                id="province"
+                required
+                className={`${inputClass} cursor-pointer appearance-none`}
+                value={formData.province}
+                onChange={set("province")}
+              >
+                <option value="" disabled>
+                  Select a province…
+                </option>
+                {PROVINCES.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">
-                  Describe the discrimination *
-                </Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe what happened, how you were treated differently..."
-                  rows={5}
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  required
-                />
-              </div>
+            <div>
+              <label htmlFor="description" className={labelClass}>
+                Describe the Discrimination *
+              </label>
+              <textarea
+                id="description"
+                required
+                rows={6}
+                className={`${inputClass} resize-none italic`}
+                placeholder="Describe what happened, how you were treated differently…"
+                value={formData.description}
+                onChange={set("description")}
+              />
+            </div>
 
-              <div className="space-y-2">
-                <Label>Photos & Videos (optional)</Label>
+            <div>
+              <label className={labelClass}>
+                Photos & Videos{" "}
+                <span className="tracking-normal text-stone-400 normal-case">
+                  (optional)
+                </span>
+              </label>
+              <div className="border border-amber-200 bg-white p-3">
                 <MediaUploader
                   mediaUrls={mediaUrls}
                   onMediaChange={setMediaUrls}
                   maxFiles={10}
                 />
               </div>
+            </div>
 
-              <div className="rounded-lg bg-muted/50 p-4">
-                <div className="flex gap-2">
-                  <AlertTriangle className="mt-0.5 h-5 w-5 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">
-                    Reports are public and affect business reputations. Only
-                    submit accurate information about real experiences. False
-                    reports may be removed.
-                  </p>
-                </div>
-              </div>
+            <div className="flex gap-3 border-l-2 border-amber-500 bg-amber-100 px-4 py-3">
+              <span className="mt-0.5 flex-shrink-0 text-base text-amber-600">
+                ⚠
+              </span>
+              <p className="text-xs leading-relaxed text-stone-600 italic">
+                Reports are public and affect business reputations. Only submit
+                accurate information about real experiences. False reports may
+                be removed.
+              </p>
+            </div>
 
-              <div className="flex gap-4">
-                <Button type="button" variant="outline" asChild>
-                  <Link href="/">Cancel</Link>
-                </Button>
-                <Button type="submit" disabled={isLoading} className="flex-1">
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    "Submit Report"
-                  )}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+            <div className="flex gap-3 pt-1">
+              <Link
+                href="/"
+                className="font-mono-dm border border-amber-300 px-5 py-2.5 text-xs tracking-widest text-stone-600 uppercase transition-colors hover:border-stone-400 hover:text-stone-900"
+              >
+                Cancel
+              </Link>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="font-mono-dm flex-1 bg-red-700 py-2.5 text-xs tracking-widest text-white uppercase transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-stone-400"
+              >
+                {isLoading ? "Submitting…" : "▲ Submit Report"}
+              </button>
+            </div>
+          </form>
+
+          <div className="space-y-5">
+            <div className="border border-amber-200 p-4">
+              <h3 className="font-playfair mb-3 border-b border-amber-200 pb-2 text-sm font-bold">
+                What to Report
+              </h3>
+              <ul className="space-y-2.5">
+                {[
+                  "Dual pricing for locals vs. foreigners",
+                  "Denial of entry or service",
+                  "Discriminatory seating or treatment",
+                  "English-only menus to discourage locals",
+                  "Dress code enforced selectively",
+                ].map((item, i) => (
+                  <li
+                    key={i}
+                    className="flex gap-2 text-xs leading-relaxed text-stone-600"
+                  >
+                    <span className="font-mono-dm mt-0.5 flex-shrink-0 text-amber-500">
+                      ›
+                    </span>
+                    <span className="italic">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-stone-900 p-4">
+              <h3 className="font-playfair mb-3 border-b border-stone-700 pb-2 text-sm font-bold text-amber-200">
+                Tips for a Strong Report
+              </h3>
+              <ul className="space-y-2.5">
+                {[
+                  "Be specific about dates and prices",
+                  "Include photos of menus or signage",
+                  "Note any staff names if possible",
+                  "Describe the exact interaction",
+                ].map((tip, i) => (
+                  <li
+                    key={i}
+                    className="flex gap-2 text-xs leading-relaxed text-stone-400"
+                  >
+                    <span className="font-mono-dm mt-0.5 flex-shrink-0 text-amber-600">
+                      {i + 1}.
+                    </span>
+                    <span className="italic">{tip}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <Link
+              href="/"
+              className="font-mono-dm flex items-center gap-2 text-[11px] tracking-widest text-stone-400 uppercase transition-colors hover:text-stone-900"
+            >
+              ← Back to all records
+            </Link>
+          </div>
+        </div>
       </main>
+
+      <SiteFooter />
     </div>
   )
 }
