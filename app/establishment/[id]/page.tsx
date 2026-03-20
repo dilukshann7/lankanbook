@@ -13,9 +13,10 @@ export default function EstablishmentPage() {
   const [reports, setReports] = useState<Report[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [testimony, setTestimony] = useState("")
-  const [mediaUrls, setMediaUrls] = useState<MediaItem[]>([])
+  const [mediaUrls, setMediaUrls] = useState<Media[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasUpvoted, setHasUpvoted] = useState(false)
+  const [upvoteCount, setUpvoteCount] = useState(0)
 
   const fetchData = useCallback(async () => {
     try {
@@ -23,15 +24,14 @@ export default function EstablishmentPage() {
         fetch(`/api/establishments/${params.id}`),
         fetch(`/api/reports?establishmentId=${params.id}`),
       ])
-
       if (estRes.ok) {
-        const estData = await estRes.json()
-        setEstablishment(estData)
+        const d = await estRes.json()
+        setEstablishment(d)
+        setUpvoteCount(d.upvotes)
       }
-
       if (reportsRes.ok) {
-        const reportsData = await reportsRes.json()
-        setReports(reportsData)
+        const data = await reportsRes.json()
+        setReports(data)
       }
     } catch {
       console.error("Failed to fetch data")
@@ -44,29 +44,27 @@ export default function EstablishmentPage() {
     fetchData()
   }, [fetchData])
 
-  const handleSubmitReport = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!testimony.trim()) return
-
     setIsSubmitting(true)
     try {
       const res = await fetch("/api/reports", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          establishmentId: params.id,
+          establishmentId: Number(params.id),
           testimony,
           mediaUrls: mediaUrls.map((m) => m.url),
         }),
       })
-
       if (res.ok) {
         setTestimony("")
         setMediaUrls([])
         fetchData()
       }
     } catch {
-      console.error("Failed to submit report")
+      console.error("Failed to submit")
     } finally {
       setIsSubmitting(false)
     }
@@ -75,142 +73,198 @@ export default function EstablishmentPage() {
   const handleUpvote = async () => {
     if (hasUpvoted) return
     setHasUpvoted(true)
+    setUpvoteCount((c) => c + 1)
     try {
-      await fetch(`/api/establishments/${params.id}/upvote`, {
-        method: "POST",
-      })
+      await fetch(`/api/establishments/${params.id}/upvote`, { method: "POST" })
     } catch {
       setHasUpvoted(false)
+      setUpvoteCount((c) => c - 1)
     }
   }
 
-  const parseMediaUrls = (urls: string): string[] => {
+  const parseMedia = (s: string | null | undefined): string[] => {
     try {
-      return JSON.parse(urls || "[]")
+      return JSON.parse(s || "[]")
     } catch {
       return []
     }
   }
 
-  if (isLoading) {
+  if (isLoading)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="font-playfair flex min-h-screen items-center justify-center bg-amber-50">
+        <div className="text-center">
+          <p className="font-playfair animate-pulse text-5xl font-black text-amber-200">
+            …
+          </p>
+          <p className="font-mono-dm mt-2 text-xs tracking-widest text-amber-600 uppercase">
+            Loading record
+          </p>
+        </div>
       </div>
     )
-  }
 
-  if (!establishment) {
+  if (!establishment)
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Card className="p-12 text-center">
-          <AlertTriangle className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-          <h3 className="mb-2 text-lg font-semibold">
+      <div className="font-playfair flex min-h-screen items-center justify-center bg-amber-50">
+        <div className="text-center">
+          <p className="font-playfair mb-4 text-6xl font-black text-amber-200">
+            ¶
+          </p>
+          <h3 className="font-playfair mb-4 text-xl italic">
             Establishment not found
           </h3>
-          <Button asChild variant="outline">
-            <Link href="/">Go Back</Link>
-          </Button>
-        </Card>
+          <Link
+            href="/"
+            className="font-mono-dm bg-stone-900 px-5 py-2 text-xs tracking-widest text-amber-50 uppercase transition-colors hover:bg-stone-700"
+          >
+            ← Back to Records
+          </Link>
+        </div>
       </div>
     )
-  }
 
-  const establishmentMedia = parseMediaUrls(establishment.mediaUrls)
+  const estMedia = parseMedia(establishment.mediaUrls)
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/">
-                <ArrowLeft className="h-5 w-5" />
-              </Link>
-            </Button>
-            <div className="flex-1">
-              <h1 className="text-2xl font-bold tracking-tight">
-                {establishment.name}
-              </h1>
-              <p className="flex items-center gap-1 text-sm text-muted-foreground">
-                <MapPin className="h-3 w-3" />
-                {establishment.location} • {establishment.province}
-              </p>
+    <div className="font-playfair min-h-screen bg-amber-50 text-stone-900">
+      <header
+        className="bg-stone-900"
+        style={{ borderBottom: "4px double #b45309" }}
+      >
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="font-mono-dm flex items-center gap-2 border-b border-stone-700 py-3 text-[10px] tracking-widest text-amber-600/70 uppercase">
+            <Link href="/" className="transition-colors hover:text-amber-400">
+              LankanBook
+            </Link>
+            <span className="text-stone-600">›</span>
+            <span className="text-amber-500/60">{establishment.province}</span>
+            <span className="text-stone-600">›</span>
+            <span className="max-w-48 truncate text-amber-300">
+              {establishment.name}
+            </span>
+          </div>
+
+          <div className="py-6">
+            <p className="font-mono-dm mb-2 text-[10px] tracking-widest text-red-500 uppercase">
+              {establishment.province} · {establishment.location}
+            </p>
+            <h1 className="font-playfair mb-4 text-3xl leading-tight font-black text-amber-50 sm:text-5xl">
+              {establishment.name}
+            </h1>
+            <div className="flex flex-wrap items-center gap-4">
+              <button
+                onClick={handleUpvote}
+                disabled={hasUpvoted}
+                className={`font-mono-dm flex items-center gap-2 border px-4 py-2 text-xs tracking-widest uppercase transition-colors ${
+                  hasUpvoted
+                    ? "cursor-default border-red-700 bg-red-700 text-white"
+                    : "border-amber-600/50 text-amber-400 hover:border-red-600 hover:text-red-400"
+                }`}
+              >
+                <span>{hasUpvoted ? "✓" : "▲"}</span>
+                <span>
+                  {upvoteCount} {upvoteCount === 1 ? "report" : "reports"}
+                </span>
+              </button>
+              <span className="font-mono-dm text-[10px] tracking-wider text-stone-500">
+                First reported{" "}
+                {new Date(establishment.createdAt).toLocaleDateString("en-LK", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
             </div>
-            <button
-              onClick={handleUpvote}
-              disabled={hasUpvoted}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition-all ${
-                hasUpvoted
-                  ? "bg-destructive/20 text-destructive"
-                  : "bg-destructive/10 text-destructive hover:bg-destructive/20"
-              }`}
-            >
-              <ThumbsUp
-                className={`h-4 w-4 ${hasUpvoted ? "animate-bounce" : ""}`}
-              />
-              {establishment.upvotes + (hasUpvoted ? 1 : 0)} reports
-            </button>
           </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <div className="grid gap-8 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
+          <div className="space-y-8 lg:col-span-2">
             {establishment.description && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Initial Report</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-muted-foreground">
-                    {establishment.description}
+              <div>
+                <div className="mb-4 flex items-baseline gap-3 border-b-2 border-stone-900 pb-2">
+                  <h2 className="font-playfair text-xl font-bold">
+                    Initial Report
+                  </h2>
+                  <span className="font-mono-dm text-[10px] tracking-widest text-amber-600 uppercase">
+                    Filed by original reporter
+                  </span>
+                </div>
+                <div className="border border-amber-200 bg-amber-100 p-5">
+                  <p className="text-sm leading-relaxed text-stone-700 italic">
+                    &ldquo;{establishment.description}&rdquo;
                   </p>
-                  {establishmentMedia.length > 0 && (
-                    <MediaGallery mediaUrls={establishmentMedia} />
+                  {estMedia.length > 0 && (
+                    <div className="mt-4">
+                      <MediaGallery mediaUrls={estMedia} />
+                    </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             )}
 
             <div>
-              <h2 className="mb-4 text-xl font-semibold">
-                Community Reports ({reports.length})
-              </h2>
+              <div className="mb-4 flex items-baseline gap-3 border-b-2 border-stone-900 pb-2">
+                <h2 className="font-playfair text-xl font-bold">
+                  Community Testimonies
+                </h2>
+                <span className="font-mono-dm text-[10px] tracking-widest text-amber-600 uppercase">
+                  {reports.length} filed
+                </span>
+              </div>
+
               {reports.length === 0 ? (
-                <Card className="p-8 text-center">
-                  <p className="text-muted-foreground">
-                    No additional reports yet
+                <div className="border border-dashed border-amber-300 p-8 text-center">
+                  <p className="font-playfair text-lg text-stone-400 italic">
+                    No additional testimonies yet.
                   </p>
-                </Card>
+                  <p className="font-mono-dm mt-1 text-xs tracking-wider text-amber-600">
+                    Be the first to corroborate this report.
+                  </p>
+                </div>
               ) : (
                 <div className="space-y-4">
-                  {reports.map((report) => {
-                    const reportMedia = parseMediaUrls(report.mediaUrls)
+                  {reports.map((report, i) => {
+                    const rMedia = parseMedia(report.mediaUrls)
                     return (
-                      <Card key={report.id}>
-                        <CardContent className="space-y-4 pt-6">
-                          <p className="text-muted-foreground">
-                            {report.testimony}
-                          </p>
-                          {reportMedia.length > 0 && (
-                            <MediaGallery mediaUrls={reportMedia} />
-                          )}
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div
+                        key={report.id}
+                        className="border-b border-amber-200 pb-5"
+                      >
+                        <div className="flex gap-4">
+                          <span className="font-mono-dm hidden w-5 flex-shrink-0 pt-0.5 text-xs text-amber-300 sm:block">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm leading-relaxed text-stone-600 italic">
+                              &ldquo;{report.testimony}&rdquo;
+                            </p>
+                            {rMedia.length > 0 && (
+                              <div className="mt-3">
+                                <MediaGallery mediaUrls={rMedia} />
+                              </div>
+                            )}
+                            <div className="font-mono-dm mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[10px] tracking-wider text-stone-400 uppercase">
                               {report.reporterName && (
-                                <span>Reported by {report.reporterName}</span>
+                                <span>— {report.reporterName}</span>
                               )}
                               <span>
-                                {new Date(
-                                  report.createdAt
-                                ).toLocaleDateString()}
+                                {new Date(report.createdAt).toLocaleDateString(
+                                  "en-LK",
+                                  {
+                                    day: "numeric",
+                                    month: "short",
+                                    year: "numeric",
+                                  }
+                                )}
                               </span>
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </div>
                     )
                   })}
                 </div>
@@ -219,74 +273,78 @@ export default function EstablishmentPage() {
           </div>
 
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Add Your Report</CardTitle>
-                <CardDescription>
-                  Share your experience to help others
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmitReport} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="testimony">Your Experience *</Label>
-                    <Textarea
-                      id="testimony"
-                      placeholder="Describe what happened..."
-                      rows={4}
-                      value={testimony}
-                      onChange={(e) => setTestimony(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Photos & Videos (optional)</Label>
+            <div className="bg-stone-900 p-5 text-amber-50">
+              <h3 className="font-playfair mb-0.5 text-lg font-bold">
+                Add Your Testimony
+              </h3>
+              <p className="font-mono-dm mb-4 text-[10px] tracking-wider text-amber-600/80 uppercase">
+                Share your experience
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="font-mono-dm mb-1.5 block text-[10px] tracking-widest text-amber-500 uppercase">
+                    Your Experience *
+                  </label>
+                  <textarea
+                    rows={5}
+                    required
+                    placeholder="Describe what happened…"
+                    value={testimony}
+                    onChange={(e) => setTestimony(e.target.value)}
+                    className="font-playfair w-full resize-none border border-stone-700 bg-stone-800 p-3 text-sm text-amber-50 italic transition-colors placeholder:text-stone-500 focus:border-amber-600 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-mono-dm mb-1.5 block text-[10px] tracking-widest text-amber-500 uppercase">
+                    Photos & Videos (optional)
+                  </label>
+                  <div className="border border-stone-700 p-2">
                     <MediaUploader
                       mediaUrls={mediaUrls}
                       onMediaChange={setMediaUrls}
                       maxFiles={5}
                     />
                   </div>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <ThumbsUp className="mr-2 h-4 w-4" />
-                        Submit Report
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+                </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Helpful Links</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <a
-                  href={`https://www.google.com/search?q=${encodeURIComponent(establishment.name + " " + establishment.location)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between rounded-md p-2 transition-colors hover:bg-muted"
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !testimony.trim()}
+                  className="font-mono-dm w-full bg-red-700 py-2.5 text-xs tracking-widest text-white uppercase transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-stone-700 disabled:text-stone-500"
                 >
-                  <span className="text-sm">View on Google</span>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                </a>
-              </CardContent>
-            </Card>
+                  {isSubmitting ? "Submitting…" : "▲ Submit Testimony"}
+                </button>
+              </form>
+            </div>
+
+            <div className="border border-amber-200 p-4">
+              <h3 className="font-playfair mb-3 border-b border-amber-200 pb-2 text-sm font-bold">
+                Helpful Links
+              </h3>
+              <a
+                href={`https://www.google.com/search?q=${encodeURIComponent(establishment.name + " " + establishment.location)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono-dm flex items-center justify-between border-b border-amber-100 py-1.5 text-[11px] tracking-wider text-stone-600 transition-colors last:border-b-0 hover:text-red-700"
+              >
+                <span>View on Google</span>
+                <span className="text-amber-400">↗</span>
+              </a>
+            </div>
+
+            <Link
+              href="/"
+              className="font-mono-dm flex items-center gap-2 text-[11px] tracking-widest text-stone-500 uppercase transition-colors hover:text-stone-900"
+            >
+              ← Back to all records
+            </Link>
           </div>
         </div>
       </main>
+
+      <SiteFooter />
     </div>
   )
 }
