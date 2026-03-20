@@ -255,16 +255,21 @@ export default function HomePage() {
                     <Badge variant="secondary">{est.province}</Badge>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <CardContent className="pb-4 sm:pb-6">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                       <span>{est.upvotes} reports</span>
-                      <span>•</span>
+                      <span className="hidden sm:inline">•</span>
                       <span>
                         {new Date(est.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <Button asChild variant="ghost" size="sm">
+                    <Button
+                      asChild
+                      variant="ghost"
+                      size="sm"
+                      className="self-start sm:self-auto"
+                    >
                       <Link href={`/establishment/${est.id}`}>
                         View Details <ChevronRight className="ml-1 h-4 w-4" />
                       </Link>
