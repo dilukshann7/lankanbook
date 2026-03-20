@@ -127,11 +127,3 @@
     @apply font-sans;
   }
 }
-
-.font-playfair {
-  font-family: var(--font-playfair), Georgia, serif;
-}
-
-.font-mono-dm {
-  font-family: var(--font-mono-dm), "Courier New", monospace;
-}
