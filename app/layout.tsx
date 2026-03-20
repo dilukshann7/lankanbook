@@ -1,15 +1,20 @@
-import { Geist, Geist_Mono, Inter } from "next/font/google"
+import { Inter, Playfair_Display, DM_Mono } from "next/font/google"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
-import { TooltipProvider } from "@/components/ui/tooltip"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
-const fontMono = Geist_Mono({
+const fontMono = DM_Mono({
+  weight: ["400", "500"],
   subsets: ["latin"],
-  variable: "--font-mono",
+  variable: "--font-mono-dm",
+})
+
+const fontPlayfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-playfair",
 })
 
 export default function RootLayout({
@@ -23,15 +28,14 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn(
         "antialiased",
+        inter.variable,
         fontMono.variable,
-        "font-sans",
-        inter.variable
+        fontPlayfair.variable,
+        "font-sans"
       )}
     >
       <body>
-        <ThemeProvider>
-          <TooltipProvider>{children}</TooltipProvider>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )
