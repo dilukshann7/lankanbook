@@ -48,7 +48,7 @@ function Dropdown({ label, options, value, onChange }: DropdownProps) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="font-mono flex items-center gap-2 border border-amber-200 bg-amber-50 px-3 py-2 text-xs tracking-widest whitespace-nowrap text-stone-600 uppercase transition-colors hover:border-amber-400 hover:bg-amber-100"
+        className="flex items-center gap-2 border border-amber-200 bg-amber-50 px-3 py-2 font-mono text-xs tracking-widest whitespace-nowrap text-stone-600 uppercase transition-colors hover:border-amber-400 hover:bg-amber-100"
       >
         {selected ? selected.label : label}
         <span
@@ -67,7 +67,7 @@ function Dropdown({ label, options, value, onChange }: DropdownProps) {
                 onChange(opt.value)
                 setOpen(false)
               }}
-              className={`font-mono block w-full border-b border-amber-100 px-4 py-2.5 text-left text-xs tracking-wider transition-colors last:border-b-0 ${
+              className={`block w-full border-b border-amber-100 px-4 py-2.5 text-left font-mono text-xs tracking-wider transition-colors last:border-b-0 ${
                 value === opt.value
                   ? "bg-stone-900 text-amber-200"
                   : "text-stone-600 hover:bg-amber-50 hover:text-stone-900"
@@ -166,7 +166,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-4 py-3">
-            <div className="font-mono flex flex-wrap gap-5 text-[11px] tracking-wider text-amber-600/70">
+            <div className="flex flex-wrap gap-5 font-mono text-[11px] tracking-wider text-amber-600/70">
               <span>
                 <span className="font-medium text-amber-300">
                   {establishments.length}
@@ -188,7 +188,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/submit"
-              className="font-mono bg-red-700 px-5 py-2 text-[11px] tracking-widest text-white uppercase transition-colors hover:bg-red-600"
+              className="bg-red-700 px-5 py-2 font-mono text-[11px] tracking-widest text-white uppercase transition-colors hover:bg-red-600"
             >
               + File a Report
             </Link>
@@ -200,7 +200,7 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-5xl items-start gap-3 px-4 py-4 sm:px-6">
           <span className="mt-0.5 flex-shrink-0 text-xl">⚖️</span>
           <div>
-            <h2 className="font-sans mb-1 text-sm font-bold">
+            <h2 className="mb-1 font-sans text-sm font-bold">
               A Modern Green Book for Sri Lanka
             </h2>
             <p className="text-xs leading-relaxed text-stone-600 italic">
@@ -220,7 +220,7 @@ export default function HomePage() {
               ⌕
             </span>
             <input
-              className="font-sans w-full border border-amber-200 bg-white py-2 pr-3 pl-8 text-sm text-stone-700 italic transition-colors placeholder:text-amber-400/80 focus:border-amber-500 focus:outline-none"
+              className="w-full border border-amber-200 bg-white py-2 pr-3 pl-8 font-sans text-sm text-stone-700 italic transition-colors placeholder:text-amber-400/80 focus:border-amber-500 focus:outline-none"
               placeholder="Search by name or location…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -266,10 +266,10 @@ export default function HomePage() {
 
         {!loading && filtered.length === 0 && (
           <div className="py-20 text-center">
-            <p className="font-sans mb-4 text-7xl leading-none font-black text-amber-200">
+            <p className="mb-4 font-sans text-7xl leading-none font-black text-amber-200">
               ¶
             </p>
-            <h3 className="font-sans mb-2 text-xl italic">
+            <h3 className="mb-2 font-sans text-xl italic">
               No establishments found
             </h3>
             <p className="mb-6 text-sm text-stone-400">
@@ -279,7 +279,7 @@ export default function HomePage() {
             </p>
             <Link
               href="/submit"
-              className="font-mono bg-stone-900 px-6 py-2.5 text-xs tracking-widest text-amber-50 uppercase transition-colors hover:bg-stone-700"
+              className="bg-stone-900 px-6 py-2.5 font-mono text-xs tracking-widest text-amber-50 uppercase transition-colors hover:bg-stone-700"
             >
               File a Report
             </Link>
@@ -293,18 +293,18 @@ export default function HomePage() {
               href={`/establishment/${est.id}`}
               className="group -mx-4 flex items-start gap-4 border-b border-amber-200 px-4 py-5 transition-colors hover:bg-amber-100/70 sm:-mx-6 sm:px-6"
             >
-              <span className="font-mono hidden w-6 flex-shrink-0 pt-1.5 text-[11px] text-amber-300 select-none sm:block">
+              <span className="hidden w-6 flex-shrink-0 pt-1.5 font-mono text-[11px] text-amber-300 select-none sm:block">
                 {String(i + 1).padStart(2, "0")}
               </span>
 
               <div className="min-w-0 flex-1">
-                <p className="font-mono mb-1 text-[10px] tracking-widest text-red-700 uppercase">
+                <p className="mb-1 font-mono text-[10px] tracking-widest text-red-700 uppercase">
                   {est.province}
                 </p>
-                <h3 className="font-sans mb-1 text-xl leading-tight font-bold transition-colors group-hover:text-red-800 sm:text-2xl">
+                <h3 className="mb-1 font-sans text-xl leading-tight font-bold transition-colors group-hover:text-red-800 sm:text-2xl">
                   {est.name}
                 </h3>
-                <p className="font-mono mb-2 text-[11px] tracking-wider text-amber-700">
+                <p className="mb-2 font-mono text-[11px] tracking-wider text-amber-700">
                   📍 {est.location}
                 </p>
                 {est.description && (
@@ -312,7 +312,7 @@ export default function HomePage() {
                     &ldquo;{est.description}&rdquo;
                   </p>
                 )}
-                <p className="font-mono mt-2.5 text-[10px] tracking-wider text-stone-400">
+                <p className="mt-2.5 font-mono text-[10px] tracking-wider text-stone-400">
                   Added{" "}
                   {new Date(est.createdAt).toLocaleDateString("en-LK", {
                     day: "numeric",
@@ -328,12 +328,12 @@ export default function HomePage() {
                 <span className="font-sans text-2xl leading-none font-black">
                   {est.upvotes}
                 </span>
-                <span className="font-mono mt-0.5 text-[9px] tracking-widest uppercase opacity-60">
+                <span className="mt-0.5 font-mono text-[9px] tracking-widest uppercase opacity-60">
                   reports
                 </span>
               </div>
 
-              <span className="font-mono hidden pt-1 text-sm text-stone-300 transition-colors group-hover:text-red-600 sm:block">
+              <span className="hidden pt-1 font-mono text-sm text-stone-300 transition-colors group-hover:text-red-600 sm:block">
                 →
               </span>
             </Link>
