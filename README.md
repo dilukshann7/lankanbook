@@ -181,28 +181,34 @@ npm run typecheck
 
 ### Establishments
 
-- `GET /api/establishments` — List all establishments (sorted by upvotes)
-- `POST /api/establishments` — Create new establishment report
-- `GET /api/establishments/[id]` — Get establishment by ID
-- `POST /api/establishments/[id]/upvote` — Increment upvote count
+| Method | Endpoint                          | Description             |
+| ------ | --------------------------------- | ----------------------- |
+| GET    | `/api/establishments`             | List all establishments |
+| POST   | `/api/establishments`             | Create new report       |
+| GET    | `/api/establishments/[id]`        | Get establishment by ID |
+| POST   | `/api/establishments/[id]/upvote` | Upvote establishment    |
 
 ### Reports
 
-- `GET /api/reports?establishmentId=X` — Get reports for establishment
-- `POST /api/reports` — Submit new testimony
+| Method | Endpoint                         | Description                   |
+| ------ | -------------------------------- | ----------------------------- |
+| GET    | `/api/reports?establishmentId=X` | Get reports for establishment |
+| POST   | `/api/reports`                   | Submit new testimony          |
 
 ### Media
 
-- `POST /api/upload` — Upload media file (images/videos)
+| Method | Endpoint      | Description       |
+| ------ | ------------- | ----------------- |
+| POST   | `/api/upload` | Upload media file |
 
-## Contributing
+## Security
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-MIT
+- Rate limiting on API routes (100 requests/minute per IP)
+- Submission limits: 5 reports per browser per 24 hours
+- Upvote limits: 1 per establishment per browser
+- Security headers: HSTS, X-Frame-Options, CSP, etc.
+- Input validation on all API endpoints
 
 ---
 
-Built with ❤️ for the Sri Lankan community
+Built with care for the Sri Lankan community.
