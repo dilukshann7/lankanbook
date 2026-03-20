@@ -27,33 +27,8 @@ Sri Lanka's tourism industry often treats local residents as second-class citize
 | Database      | PostgreSQL via [Neon](https://neon.tech/)      |
 | ORM           | [Drizzle ORM](https://orm.drizzle.team/)       |
 | Styling       | Tailwind CSS                                   |
-| UI Components | [shadcn/ui](https://ui.shadcn.com/)            |
 | Media Storage | [@vercel/blob](https://vercel.com/blob)        |
-| Fonts         | Playfair Display, DM Mono                      |
-
-## Project Structure
-
-```
-lankanbook/
-├── app/
-│   ├── api/                    # Backend API routes
-│   │   ├── establishments/     # GET/POST establishments, GET by ID, upvote
-│   │   ├── reports/           # GET/POST testimonies
-│   │   └── upload/            # Media file uploads
-│   ├── establishment/[id]/   # Individual establishment page
-│   ├── submit/                # Submit new report page
-│   ├── page.tsx               # Homepage
-│   └── layout.tsx             # Root layout with fonts
-├── components/
-│   ├── media/                  # MediaUploader, MediaGallery
-│   ├── site-footer.tsx        # Shared footer with GitHub link
-│   └── ui/                    # shadcn/ui components
-├── lib/
-│   ├── db/                    # Database connection & schema
-│   ├── types.ts               # TypeScript type definitions
-│   └── utils.ts               # Utility functions
-└── drizzle/                   # Database migrations
-```
+| Deployment    | [Vercel](https://vercel.com/)                  |
 
 ## Getting Started
 
