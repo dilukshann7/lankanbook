@@ -7,8 +7,8 @@ const SiteFooter = () => {
       style={{ borderTop: "4px double #b45309" }}
     >
       <p className="font-mono text-[11px] tracking-widest text-amber-700/70 uppercase">
-        LankanBook · A Community Project to Document Discrimination ·{" "}
-        {new Date().getFullYear()}
+        LankanBook · A Community Project to <br />
+        Document Discrimination · {new Date().getFullYear()}
       </p>
       <div className="mt-2 flex justify-center gap-4">
         <a

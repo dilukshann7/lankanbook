@@ -141,19 +141,19 @@ export default function HomePage() {
   })
 
   return (
-    <div className="font-sans min-h-screen bg-amber-50 text-stone-900">
+    <div className="min-h-screen bg-amber-50 font-sans text-stone-900">
       <header
         className="bg-stone-900"
         style={{ borderBottom: "4px double #b45309" }}
       >
         <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="font-mono flex flex-wrap items-center justify-between gap-1 border-b border-stone-700 py-2.5 text-[10px] tracking-widest text-amber-600/80 uppercase">
-            <span>Est. 2024 · Community Accountability Project</span>
+          <div className="flex flex-wrap items-center justify-between gap-1 border-b border-stone-700 py-2.5 font-mono text-[10px] tracking-widest text-amber-600/80 uppercase">
+            <span>Est. 2026 · Community Accountability Project</span>
             <span className="hidden sm:block">{today}</span>
           </div>
 
           <div className="border-b border-stone-700/40 py-7 text-center">
-            <p className="font-mono mb-2 text-[10px] tracking-[0.4em] text-amber-600/70 uppercase">
+            <p className="mb-2 font-mono text-[10px] tracking-[0.4em] text-amber-600/70 uppercase">
               The People&apos;s Record of
             </p>
             <h1 className="font-sans text-6xl leading-none font-black tracking-tight text-amber-50 sm:text-8xl">
