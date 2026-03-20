@@ -6,6 +6,7 @@ import SiteFooter from "@/components/site-footer"
 import { useRouter } from "next/navigation"
 import { MediaUploader } from "@/components/media/upload"
 import type { Media } from "@/lib/types"
+import { useSubmissionTracker } from "@/hooks/use-tracker"
 
 const PROVINCES = [
   "Western Province",
@@ -29,6 +30,7 @@ export default function SubmitPage() {
     province: "",
     description: "",
   })
+  const { canSubmit, remaining, recordSubmission } = useSubmissionTracker(5)
 
   const set =
     (k: string) =>
@@ -41,6 +43,7 @@ export default function SubmitPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!canSubmit) return
     setIsLoading(true)
     try {
       const res = await fetch("/api/establishments", {
@@ -53,6 +56,7 @@ export default function SubmitPage() {
       })
       if (res.ok) {
         const d = await res.json()
+        recordSubmission(d.id)
         router.push(`/establishment/${d.id}`)
       }
     } catch {
@@ -69,13 +73,13 @@ export default function SubmitPage() {
   const labelClass = `font-mono block text-[10px] tracking-widest text-amber-700 uppercase mb-1.5`
 
   return (
-    <div className="font-sans min-h-screen bg-amber-50 text-stone-900">
+    <div className="min-h-screen bg-amber-50 font-sans text-stone-900">
       <header
         className="bg-stone-900"
         style={{ borderBottom: "4px double #b45309" }}
       >
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="font-mono flex items-center gap-2 border-b border-stone-700 py-3 text-[10px] tracking-widest text-amber-600/70 uppercase">
+          <div className="flex items-center gap-2 border-b border-stone-700 py-3 font-mono text-[10px] tracking-widest text-amber-600/70 uppercase">
             <Link href="/" className="transition-colors hover:text-amber-400">
               LankanBook
             </Link>
@@ -83,7 +87,7 @@ export default function SubmitPage() {
             <span className="text-amber-300">File a Report</span>
           </div>
           <div className="py-6">
-            <p className="font-mono mb-2 text-[10px] tracking-[0.3em] text-amber-600/60 uppercase">
+            <p className="mb-2 font-mono text-[10px] tracking-[0.3em] text-amber-600/60 uppercase">
               Community Record
             </p>
             <h1 className="font-sans text-4xl leading-tight font-black text-amber-50 sm:text-5xl">
@@ -195,23 +199,27 @@ export default function SubmitPage() {
             <div className="flex gap-3 pt-1">
               <Link
                 href="/"
-                className="font-mono border border-amber-300 px-5 py-2.5 text-xs tracking-widest text-stone-600 uppercase transition-colors hover:border-stone-400 hover:text-stone-900"
+                className="border border-amber-300 px-5 py-2.5 font-mono text-xs tracking-widest text-stone-600 uppercase transition-colors hover:border-stone-400 hover:text-stone-900"
               >
                 Cancel
               </Link>
               <button
                 type="submit"
-                disabled={isLoading}
-                className="font-mono flex-1 bg-red-700 py-2.5 text-xs tracking-widest text-white uppercase transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-stone-400"
+                disabled={isLoading || !canSubmit}
+                className="flex-1 bg-red-700 py-2.5 font-mono text-xs tracking-widest text-white uppercase transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-stone-400"
               >
-                {isLoading ? "Submitting…" : "▲ Submit Report"}
+                {isLoading
+                  ? "Submitting…"
+                  : canSubmit
+                    ? `▲ Submit Report (${remaining} left)`
+                    : "Limit Reached"}
               </button>
             </div>
           </form>
 
           <div className="space-y-5">
             <div className="border border-amber-200 p-4">
-              <h3 className="font-sans mb-3 border-b border-amber-200 pb-2 text-sm font-bold">
+              <h3 className="mb-3 border-b border-amber-200 pb-2 font-sans text-sm font-bold">
                 What to Report
               </h3>
               <ul className="space-y-2.5">
@@ -226,7 +234,7 @@ export default function SubmitPage() {
                     key={i}
                     className="flex gap-2 text-xs leading-relaxed text-stone-600"
                   >
-                    <span className="font-mono mt-0.5 flex-shrink-0 text-amber-500">
+                    <span className="mt-0.5 flex-shrink-0 font-mono text-amber-500">
                       ›
                     </span>
                     <span className="italic">{item}</span>
@@ -236,7 +244,7 @@ export default function SubmitPage() {
             </div>
 
             <div className="bg-stone-900 p-4">
-              <h3 className="font-sans mb-3 border-b border-stone-700 pb-2 text-sm font-bold text-amber-200">
+              <h3 className="mb-3 border-b border-stone-700 pb-2 font-sans text-sm font-bold text-amber-200">
                 Tips for a Strong Report
               </h3>
               <ul className="space-y-2.5">
@@ -250,7 +258,7 @@ export default function SubmitPage() {
                     key={i}
                     className="flex gap-2 text-xs leading-relaxed text-stone-400"
                   >
-                    <span className="font-mono mt-0.5 flex-shrink-0 text-amber-600">
+                    <span className="mt-0.5 flex-shrink-0 font-mono text-amber-600">
                       {i + 1}.
                     </span>
                     <span className="italic">{tip}</span>
@@ -261,7 +269,7 @@ export default function SubmitPage() {
 
             <Link
               href="/"
-              className="font-mono flex items-center gap-2 text-[11px] tracking-widest text-stone-400 uppercase transition-colors hover:text-stone-900"
+              className="flex items-center gap-2 font-mono text-[11px] tracking-widest text-stone-400 uppercase transition-colors hover:text-stone-900"
             >
               ← Back to all records
             </Link>

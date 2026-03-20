@@ -24,6 +24,13 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { name, location, province, description, mediaUrls } = body
 
+    if (!name || !location || !province) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      )
+    }
+
     const newEstablishment = await db
       .insert(establishmentsTable)
       .values({

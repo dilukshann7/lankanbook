@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useSyncExternalStore } from "react"
+import { useEffect, useState, useCallback } from "react"
 
 const SUBMISSION_KEY = "lankanbook_submissions"
 const UPVOTE_KEY = "lankanbook_upvoted"
@@ -14,86 +14,83 @@ interface UpvoteRecord {
   ids: number[]
 }
 
-const emptySubmissions: SubmissionRecord = { ids: [], timestamp: 0 }
-const emptyUpvoted: UpvoteRecord = { ids: [] }
-
-function subscribe(callback: () => void) {
-  window.addEventListener("storage", callback)
-  return () => window.removeEventListener("storage", callback)
-}
-
-function getSubmissions(): SubmissionRecord {
-  if (typeof window === "undefined") return emptySubmissions
-  const stored = localStorage.getItem(SUBMISSION_KEY)
-  if (!stored) return emptySubmissions
-  try {
-    const parsed = JSON.parse(stored) as SubmissionRecord
-    const dayMs = 24 * 60 * 60 * 1000
-    if (Date.now() - parsed.timestamp > dayMs) {
-      localStorage.removeItem(SUBMISSION_KEY)
-      return emptySubmissions
-    }
-    return parsed
-  } catch {
-    localStorage.removeItem(SUBMISSION_KEY)
-    return emptySubmissions
-  }
-}
-
-function getUpvoted(): UpvoteRecord {
-  if (typeof window === "undefined") return emptyUpvoted
-  const stored = localStorage.getItem(UPVOTE_KEY)
-  if (!stored) return emptyUpvoted
-  try {
-    return JSON.parse(stored) as UpvoteRecord
-  } catch {
-    localStorage.removeItem(UPVOTE_KEY)
-    return emptyUpvoted
-  }
-}
-
 export function useSubmissionTracker(limit: number = 5) {
-  const submissions = useSyncExternalStore(
-    subscribe,
-    getSubmissions,
-    getSubmissions
-  )
+  const [submissions, setSubmissions] = useState<SubmissionRecord | null>(null)
 
-  const canSubmit = submissions.ids.length < limit
-  const remaining = Math.max(0, limit - submissions.ids.length)
+  useEffect(() => {
+    const stored = localStorage.getItem(SUBMISSION_KEY)
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as SubmissionRecord
+        const dayMs = 24 * 60 * 60 * 1000
+        if (Date.now() - parsed.timestamp > dayMs) {
+          localStorage.removeItem(SUBMISSION_KEY)
+          setSubmissions({ ids: [], timestamp: Date.now() })
+        } else {
+          setSubmissions(parsed)
+        }
+      } catch {
+        localStorage.removeItem(SUBMISSION_KEY)
+        setSubmissions({ ids: [], timestamp: Date.now() })
+      }
+    } else {
+      setSubmissions({ ids: [], timestamp: Date.now() })
+    }
+  }, [])
+
+  const canSubmit = submissions !== null && submissions.ids.length < limit
+  const remaining =
+    submissions !== null ? Math.max(0, limit - submissions.ids.length) : limit
 
   const recordSubmission = useCallback(
     (id: number) => {
-      const current = getSubmissions()
-      if (current.ids.length >= limit) return false
-      const updated: SubmissionRecord = {
-        ids: [...current.ids, id],
-        timestamp: current.timestamp || Date.now(),
+      if (!submissions) return
+      const updated = {
+        ids: [...submissions.ids, id],
+        timestamp: submissions.timestamp,
       }
+      setSubmissions(updated)
       localStorage.setItem(SUBMISSION_KEY, JSON.stringify(updated))
-      return true
     },
-    [limit]
+    [submissions]
   )
 
   return { canSubmit, remaining, recordSubmission }
 }
 
 export function useUpvoteTracker() {
-  const upvoted = useSyncExternalStore(subscribe, getUpvoted, getUpvoted)
+  const [upvoted, setUpvoted] = useState<UpvoteRecord | null>(null)
+
+  useEffect(() => {
+    const stored = localStorage.getItem(UPVOTE_KEY)
+    if (stored) {
+      try {
+        setUpvoted(JSON.parse(stored) as UpvoteRecord)
+      } catch {
+        localStorage.removeItem(UPVOTE_KEY)
+        setUpvoted({ ids: [] })
+      }
+    } else {
+      setUpvoted({ ids: [] })
+    }
+  }, [])
 
   const hasUpvoted = useCallback(
-    (id: number) => upvoted.ids.includes(id),
+    (id: number) => {
+      return upvoted?.ids.includes(id) ?? false
+    },
     [upvoted]
   )
 
-  const recordUpvote = useCallback((id: number) => {
-    const current = getUpvoted()
-    if (current.ids.includes(id)) return false
-    const updated: UpvoteRecord = { ids: [...current.ids, id] }
-    localStorage.setItem(UPVOTE_KEY, JSON.stringify(updated))
-    return true
-  }, [])
+  const recordUpvote = useCallback(
+    (id: number) => {
+      if (!upvoted || upvoted.ids.includes(id)) return
+      const updated = { ids: [...upvoted.ids, id] }
+      setUpvoted(updated)
+      localStorage.setItem(UPVOTE_KEY, JSON.stringify(updated))
+    },
+    [upvoted]
+  )
 
   return { hasUpvoted, recordUpvote }
 }

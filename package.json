@@ -1,8 +1,21 @@
 {
   "name": "lankanbook",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "private": true,
+  "description": "A platform to discover and share Sri Lankan establishments",
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "sri-lanka",
+    "establishments",
+    "directory",
+    "nextjs"
+  ],
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

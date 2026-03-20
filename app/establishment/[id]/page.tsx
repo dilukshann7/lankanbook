@@ -6,6 +6,7 @@ import Link from "next/link"
 import SiteFooter from "@/components/site-footer"
 import { MediaUploader, MediaGallery } from "@/components/media/upload"
 import type { Establishment, Report, Media } from "@/lib/types"
+import { useUpvoteTracker } from "@/hooks/use-tracker"
 
 export default function EstablishmentPage() {
   const params = useParams()
@@ -15,8 +16,10 @@ export default function EstablishmentPage() {
   const [testimony, setTestimony] = useState("")
   const [mediaUrls, setMediaUrls] = useState<Media[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [hasUpvoted, setHasUpvoted] = useState(false)
+  const { hasUpvoted, recordUpvote } = useUpvoteTracker()
   const [upvoteCount, setUpvoteCount] = useState(0)
+  const establishmentId = Number(params.id)
+  const userHasUpvoted = hasUpvoted(establishmentId)
 
   const fetchData = useCallback(async () => {
     try {
@@ -71,13 +74,12 @@ export default function EstablishmentPage() {
   }
 
   const handleUpvote = async () => {
-    if (hasUpvoted) return
-    setHasUpvoted(true)
+    if (userHasUpvoted) return
+    recordUpvote(establishmentId)
     setUpvoteCount((c) => c + 1)
     try {
       await fetch(`/api/establishments/${params.id}/upvote`, { method: "POST" })
     } catch {
-      setHasUpvoted(false)
       setUpvoteCount((c) => c - 1)
     }
   }
@@ -153,14 +155,14 @@ export default function EstablishmentPage() {
             <div className="flex flex-wrap items-center gap-4">
               <button
                 onClick={handleUpvote}
-                disabled={hasUpvoted}
+                disabled={userHasUpvoted}
                 className={`flex items-center gap-2 border px-4 py-2 font-mono text-xs tracking-widest uppercase transition-colors ${
-                  hasUpvoted
+                  userHasUpvoted
                     ? "cursor-default border-red-700 bg-red-700 text-white"
                     : "border-amber-600/50 text-amber-400 hover:border-red-600 hover:text-red-400"
                 }`}
               >
-                <span>{hasUpvoted ? "✓" : "▲"}</span>
+                <span>{userHasUpvoted ? "✓" : "▲"}</span>
                 <span>
                   {upvoteCount} {upvoteCount === 1 ? "report" : "reports"}
                 </span>

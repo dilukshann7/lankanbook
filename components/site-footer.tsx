@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 const SiteFooter = () => {
   return (
     <footer
@@ -8,14 +10,22 @@ const SiteFooter = () => {
         LankanBook · A Community Project to Document Discrimination ·{" "}
         {new Date().getFullYear()}
       </p>
-      <a
-        href="https://github.com/dilukshann7/lankanbook"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="font-mono mt-2 inline-block text-[10px] tracking-widest text-amber-600/50 uppercase transition-colors hover:text-amber-400"
-      >
-        View on GitHub
-      </a>
+      <div className="mt-2 flex justify-center gap-4">
+        <a
+          href="https://github.com/dilukshann7/lankanbook"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-[10px] tracking-widest text-amber-600/50 uppercase transition-colors hover:text-amber-400"
+        >
+          GitHub
+        </a>
+        <Link
+          href="/about"
+          className="font-mono text-[10px] tracking-widest text-amber-600/50 uppercase transition-colors hover:text-amber-400"
+        >
+          About
+        </Link>
+      </div>
     </footer>
   )
 }
