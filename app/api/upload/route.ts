@@ -51,11 +51,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
+    const isImage = file.type.startsWith("image/")
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const optimizedBuffer = isImage ? await optimizeImage(buffer) : buffer
     const filename = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`
 
-    const blob = await put(filename, file, {
+    const blob = await put(filename, optimizedBuffer, {
       access: "public",
       token: process.env.BLOB_READ_WRITE_TOKEN,
+      addRandomSuffix: false,
     })
 
     return NextResponse.json({ url: blob.url })
