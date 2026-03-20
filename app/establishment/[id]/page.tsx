@@ -3,59 +3,9 @@
 import { useState, useEffect, useCallback } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import {
-  ArrowLeft,
-  MapPin,
-  ThumbsUp,
-  Loader2,
-  ExternalLink,
-  AlertTriangle,
-  Home,
-} from "lucide-react"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+import SiteFooter from "@/components/site-footer"
 import { MediaUploader, MediaGallery } from "@/components/media/upload"
-
-interface MediaItem {
-  url: string
-  type: "image" | "video"
-}
-
-interface Establishment {
-  id: number
-  name: string
-  location: string
-  province: string
-  description: string | null
-  mediaUrls: string
-  upvotes: number
-  createdAt: string
-}
-
-interface Report {
-  id: number
-  establishmentId: number
-  testimony: string
-  mediaUrls: string
-  reporterName: string | null
-  upvotes: number
-  createdAt: string
-}
+import type { Establishment, Report, Media } from "@/lib/types"
 
 export default function EstablishmentPage() {
   const params = useParams()

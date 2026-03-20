@@ -2,22 +2,12 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import SiteFooter from "@/components/site-footer"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { AlertTriangle, ArrowLeft, Loader2 } from "lucide-react"
 import { MediaUploader } from "@/components/media/upload"
+import type { Media } from "@/lib/types"
 
-const provinces = [
+const PROVINCES = [
   "Western Province",
   "Central Province",
   "Southern Province",

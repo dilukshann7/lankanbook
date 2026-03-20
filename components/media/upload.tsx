@@ -1,25 +1,11 @@
 "use client"
 
-import { useState, useRef } from "react"
-import {
-  X,
-  Upload,
-  Image as ImageIcon,
-  Video,
-  Loader2,
-  Trash2,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-
-interface MediaItem {
-  url: string
-  type: "image" | "video"
-}
+import { useState, useRef, DragEvent } from "react"
+import type { Media } from "@/lib/types"
 
 interface MediaUploaderProps {
-  mediaUrls: MediaItem[]
-  onMediaChange: (urls: MediaItem[]) => void
+  mediaUrls: Media[]
+  onMediaChange: (media: Media[]) => void
   maxFiles?: number
 }
 

@@ -1,44 +1,11 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Search,
-  AlertTriangle,
-  MapPin,
-  ChevronRight,
-  Shield,
-  ChevronDown,
-} from "lucide-react"
+import SiteFooter from "@/components/site-footer"
+import type { Establishment } from "@/lib/types"
 
-interface Establishment {
-  id: number
-  name: string
-  location: string
-  province: string
-  description: string | null
-  upvotes: number
-  createdAt: string
-}
-
-const provinces = [
+const PROVINCES = [
   "Western Province",
   "Central Province",
   "Southern Province",
