@@ -38,30 +38,39 @@ Sri Lanka's tourism industry often treats local residents as second-class citize
 - A Neon PostgreSQL database
 - A Vercel Blob account (for media uploads)
 
+### Clone the Repository
+
+```bash
+git clone https://github.com/dilukshann7/lankanbook.git
+cd lankanbook
+```
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
 ### Environment Variables
 
-Create a `.env` file:
+Copy `.env.example` to `.env` and fill in your values:
 
 ```env
 DATABASE_URL=postgresql://user:password@host/dbname
 BLOB_READ_WRITE_TOKEN=your_vercel_blob_token
 ```
 
-### Installation
-
-```bash
-npm install
-```
+Get a free Neon database at [neon.tech](https://neon.tech) and a Vercel Blob token at [vercel.com/blob](https://vercel.com/blob).
 
 ### Database Setup
 
-Run migrations to create tables:
+Push your schema to the database:
 
 ```bash
 npx drizzle-kit push
 ```
 
-### Development
+### Run Development Server
 
 ```bash
 npm run dev
