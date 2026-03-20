@@ -1,8 +1,14 @@
-# LankanBook 🏛️
+# LankanBook
 
 > A community-driven platform documenting establishments in Sri Lanka that discriminate against local residents.
 
-Inspired by the historic Negro Motorist Green Book, LankanBook empowers communities to share and verify experiences of discrimination—whether dual pricing, denial of entry, or selective enforcement of policies.
+Inspired by the historic [Negro Motorist Green Book](https://en.wikipedia.org/wiki/Negro_Motorist_Green_Book), LankanBook empowers communities to share and verify experiences of discrimination—whether dual pricing, denial of entry, or selective enforcement of policies against Sri Lankan residents.
+
+## Why This Project Exists
+
+Sri Lanka's tourism industry often treats local residents as second-class citizens—charging foreigners higher prices, denying entry to locals, or enforcing discriminatory policies. This project creates a transparent, community-verified record of such establishments.
+
+**Our philosophy:** Community upvoting verifies authenticity. If multiple people report the same establishment, it gains credibility.
 
 ## Features
 
