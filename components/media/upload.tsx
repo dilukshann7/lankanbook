@@ -19,14 +19,10 @@ export function MediaUploader({
   const inputRef = useRef<HTMLInputElement>(null)
 
   const handleUpload = async (files: FileList | null) => {
-    if (!files || files.length === 0) return
-    if (mediaUrls.length >= maxFiles) return
-
+    if (!files || files.length === 0 || mediaUrls.length >= maxFiles) return
     setIsUploading(true)
-
     try {
-      const newMedia: MediaItem[] = []
-
+      const newMedia = []
       for (
         let i = 0;
         i < files.length && mediaUrls.length + newMedia.length < maxFiles;
@@ -35,105 +31,106 @@ export function MediaUploader({
         const file = files[i]
         const formData = new FormData()
         formData.append("file", file)
-
         const res = await fetch("/api/upload", {
           method: "POST",
           body: formData,
         })
-
         if (res.ok) {
           const { url } = await res.json()
-          const type = file.type.startsWith("video") ? "video" : "image"
-          newMedia.push({ url, type })
+          newMedia.push({
+            url,
+            type: (file.type.startsWith("video") ? "video" : "image") as
+              | "video"
+              | "image",
+          })
         }
       }
-
       onMediaChange([...mediaUrls, ...newMedia])
-    } catch (error) {
-      console.error("Upload failed:", error)
+    } catch (err) {
+      console.error("Upload failed:", err)
     } finally {
       setIsUploading(false)
     }
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setDragActive(false)
     handleUpload(e.dataTransfer.files)
   }
-
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     setDragActive(true)
   }
-
-  const handleDragLeave = () => {
-    setDragActive(false)
-  }
-
-  const removeMedia = (index: number) => {
-    const updated = mediaUrls.filter((_, i) => i !== index)
-    onMediaChange(updated)
-  }
+  const handleDragLeave = () => setDragActive(false)
+  const removeMedia = (index: number) =>
+    onMediaChange(mediaUrls.filter((_, i) => i !== index))
+  const atLimit = mediaUrls.length >= maxFiles
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div
-        className={cn(
-          "relative rounded-lg border-2 border-dashed p-8 text-center transition-colors",
-          dragActive
-            ? "border-primary bg-muted/50"
-            : "border-muted-foreground/25"
-        )}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
+        className={`relative border-2 border-dashed p-6 text-center transition-colors ${
+          dragActive
+            ? "border-amber-500 bg-amber-50"
+            : atLimit
+              ? "cursor-not-allowed border-stone-200 bg-stone-50 opacity-60"
+              : "border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50/50"
+        }`}
       >
         <input
           ref={inputRef}
           type="file"
           accept="image/*,video/*"
           multiple
-          onChange={(e) => handleUpload(e.target.files)}
           className="hidden"
+          onChange={(e) => handleUpload(e.target.files)}
         />
-        <div className="flex flex-col items-center gap-2">
-          {isUploading ? (
-            <>
-              <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Uploading...</p>
-            </>
-          ) : (
-            <>
-              <div className="flex gap-2">
-                <Upload className="h-10 w-10 text-muted-foreground" />
-                <ImageIcon className="h-10 w-10 text-muted-foreground" />
-                <Video className="h-10 w-10 text-muted-foreground" />
-              </div>
-              <p className="text-sm text-muted-foreground">
-                Drag and drop photos or videos, or{" "}
-                <button
-                  type="button"
-                  onClick={() => inputRef.current?.click()}
-                  className="text-primary hover:underline"
-                >
-                  browse
-                </button>
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {mediaUrls.length}/{maxFiles} files uploaded
-              </p>
-            </>
-          )}
-        </div>
+
+        {isUploading ? (
+          <div className="flex flex-col items-center gap-2">
+            <span className="font-mono-dm animate-pulse text-xs tracking-widest text-amber-600 uppercase">
+              Uploading…
+            </span>
+            <div className="relative h-px w-32 overflow-hidden bg-amber-200">
+              <div
+                className="absolute inset-y-0 left-0 animate-[loading_1s_ease-in-out_infinite] bg-amber-500"
+                style={{
+                  width: "40%",
+                  animation: "slide 1s ease-in-out infinite",
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-2xl text-amber-400 select-none">⊕</span>
+            <p className="font-mono-dm text-[11px] tracking-wider text-stone-500">
+              Drag & drop photos or videos, or{" "}
+              <button
+                type="button"
+                onClick={() => !atLimit && inputRef.current?.click()}
+                className="text-amber-700 underline underline-offset-2 transition-colors hover:text-amber-500"
+              >
+                browse
+              </button>
+            </p>
+            <p className="font-mono-dm text-[10px] tracking-widest text-amber-400 uppercase">
+              {mediaUrls.length} / {maxFiles} files
+            </p>
+          </div>
+        )}
       </div>
 
       {mediaUrls.length > 0 && (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
           {mediaUrls.map((media, index) => (
             <div
               key={index}
-              className="relative aspect-square overflow-hidden rounded-md border bg-muted"
+              className="group relative aspect-square overflow-hidden border border-amber-200 bg-stone-100"
             >
               {media.type === "image" ? (
                 <img
@@ -142,126 +139,168 @@ export function MediaUploader({
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <video
-                  src={media.url}
-                  className="h-full w-full object-cover"
-                  controls
-                />
+                <div className="flex h-full w-full items-center justify-center bg-stone-200">
+                  <span className="text-2xl text-stone-400">▶</span>
+                </div>
               )}
               <button
                 type="button"
                 onClick={() => removeMedia(index)}
-                className="text-destructive-foreground absolute top-1 right-1 rounded-full bg-destructive p-1 transition-colors hover:bg-destructive/80"
+                className="absolute inset-0 flex items-center justify-center bg-stone-900/60 opacity-0 transition-opacity group-hover:opacity-100"
               >
-                <Trash2 className="h-3 w-3" />
+                <span className="font-mono-dm text-[10px] tracking-widest text-red-300 uppercase">
+                  Remove
+                </span>
               </button>
+              <span className="font-mono-dm absolute bottom-1 left-1 bg-stone-900/70 px-1 text-[9px] text-amber-200">
+                {String(index + 1).padStart(2, "0")}
+              </span>
             </div>
           ))}
         </div>
       )}
+
+      <style>{`
+        @keyframes slide {
+          0%   { transform: translateX(-100%); }
+          100% { transform: translateX(350%); }
+        }
+      `}</style>
     </div>
   )
 }
 
-interface MediaGalleryProps {
+export function MediaGallery({
+  mediaUrls,
+  className = "",
+}: {
   mediaUrls: string[]
   className?: string
-}
-
-export function MediaGallery({ mediaUrls, className }: MediaGalleryProps) {
+}) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
 
-  if (mediaUrls.length === 0) return null
+  if (!mediaUrls || mediaUrls.length === 0) return null
 
-  const parsedMedia = mediaUrls.map((url) => {
-    const isVideo = url.match(/\.(mp4|mov|webm|ogg)$/i)
-    return { url, type: isVideo ? ("video" as const) : ("image" as const) }
-  })
+  const parsed: Media[] = mediaUrls.map((url) => ({
+    url,
+    type: (/\.(mp4|mov|webm|ogg)$/i.test(url) ? "video" : "image") as
+      | "video"
+      | "image",
+  }))
+
+  const prev = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedIndex((i) => (i !== null && i > 0 ? i - 1 : parsed.length - 1))
+  }
+  const next = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setSelectedIndex((i) => (i !== null && i < parsed.length - 1 ? i + 1 : 0))
+  }
 
   return (
     <>
-      <div
-        className={cn(
-          "grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4",
-          className
-        )}
-      >
-        {parsedMedia.map((media, index) => (
+      <div className={`grid grid-cols-3 gap-1.5 sm:grid-cols-4 ${className}`}>
+        {parsed.map((media, index) => (
           <button
             key={index}
+            type="button"
             onClick={() => setSelectedIndex(index)}
-            className="relative aspect-square overflow-hidden rounded-md border bg-muted transition-opacity hover:opacity-80"
+            className="group relative aspect-square overflow-hidden border border-amber-200 bg-stone-100 transition-colors hover:border-amber-500"
           >
             {media.type === "image" ? (
               <img
                 src={media.url}
                 alt={`Media ${index + 1}`}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-cover transition-opacity group-hover:opacity-90"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-muted-foreground/20">
-                <Video className="h-8 w-8 text-muted-foreground" />
+              <div className="flex h-full w-full items-center justify-center bg-stone-200">
+                <span className="text-2xl text-stone-400 transition-colors group-hover:text-stone-600">
+                  ▶
+                </span>
               </div>
             )}
+            <span className="font-mono-dm absolute bottom-1 left-1 bg-stone-900/70 px-1 text-[9px] text-amber-200">
+              {String(index + 1).padStart(2, "0")}
+            </span>
           </button>
         ))}
       </div>
 
       {selectedIndex !== null && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/95"
           onClick={() => setSelectedIndex(null)}
         >
-          <button
-            onClick={() => setSelectedIndex(null)}
-            className="absolute top-4 right-4 rounded-full bg-white/10 p-2 transition-colors hover:bg-white/20"
-          >
-            <X className="h-6 w-6 text-white" />
-          </button>
+          <div className="absolute top-0 right-0 left-0 flex items-center justify-between border-b border-stone-800 px-4 py-3 sm:px-6">
+            <span className="font-mono-dm text-[10px] tracking-widest text-amber-600 uppercase">
+              LankanBook · Evidence
+            </span>
+            <div className="flex items-center gap-4">
+              <span className="font-mono-dm text-[10px] tracking-widest text-stone-500">
+                {selectedIndex + 1} / {parsed.length}
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedIndex(null)}
+                className="font-mono-dm text-[10px] tracking-widest text-stone-400 uppercase transition-colors hover:text-amber-400"
+              >
+                Close ×
+              </button>
+            </div>
+          </div>
 
           <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setSelectedIndex((prev) =>
-                prev! > 0 ? prev! - 1 : parsedMedia.length - 1
-              )
-            }}
-            className="absolute left-4 rounded-full bg-white/10 p-2 transition-colors hover:bg-white/20"
+            type="button"
+            onClick={prev}
+            className="font-mono-dm absolute left-3 z-10 px-2 py-4 text-2xl text-stone-400 transition-colors hover:text-amber-400 sm:left-6"
           >
-            <span className="text-2xl text-white">‹</span>
-          </button>
-
-          <button
-            onClick={(e) => {
-              e.stopPropagation()
-              setSelectedIndex((prev) =>
-                prev! < parsedMedia.length - 1 ? prev! + 1 : 0
-              )
-            }}
-            className="absolute right-4 rounded-full bg-white/10 p-2 transition-colors hover:bg-white/20"
-          >
-            <span className="text-2xl text-white">›</span>
+            ‹
           </button>
 
           <div
-            className="max-h-[90vh] max-w-4xl"
-            onClick={(e) => e.stopPropagation()}
+            className="mx-16 mt-10 max-h-[80vh] max-w-4xl"
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >
-            {parsedMedia[selectedIndex].type === "image" ? (
+            {parsed[selectedIndex].type === "image" ? (
               <img
-                src={parsedMedia[selectedIndex].url}
+                src={parsed[selectedIndex].url}
                 alt={`Media ${selectedIndex + 1}`}
-                className="max-h-[90vh] max-w-full object-contain"
+                className="max-h-[80vh] max-w-full border border-stone-700 object-contain"
               />
             ) : (
               <video
-                src={parsedMedia[selectedIndex].url}
-                className="max-h-[90vh] max-w-full object-contain"
+                src={parsed[selectedIndex].url}
+                className="max-h-[80vh] max-w-full object-contain"
                 controls
                 autoPlay
               />
             )}
           </div>
+
+          <button
+            type="button"
+            onClick={next}
+            className="font-mono-dm absolute right-3 z-10 px-2 py-4 text-2xl text-stone-400 transition-colors hover:text-amber-400 sm:right-6"
+          >
+            ›
+          </button>
+
+          {parsed.length > 1 && (
+            <div className="absolute right-0 bottom-0 left-0 flex justify-center gap-1.5 border-t border-stone-800 py-3">
+              {parsed.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation()
+                    setSelectedIndex(i)
+                  }}
+                  className={`h-1 w-6 transition-colors ${i === selectedIndex ? "bg-amber-500" : "bg-stone-600 hover:bg-stone-400"}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </>
