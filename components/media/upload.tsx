@@ -92,7 +92,7 @@ export function MediaUploader({
 
         {isUploading ? (
           <div className="flex flex-col items-center gap-2">
-            <span className="font-mono-dm animate-pulse text-xs tracking-widest text-amber-600 uppercase">
+            <span className="font-mono animate-pulse text-xs tracking-widest text-amber-600 uppercase">
               Uploading…
             </span>
             <div className="relative h-px w-32 overflow-hidden bg-amber-200">
@@ -108,7 +108,7 @@ export function MediaUploader({
         ) : (
           <div className="flex flex-col items-center gap-2">
             <span className="text-2xl text-amber-400 select-none">⊕</span>
-            <p className="font-mono-dm text-[11px] tracking-wider text-stone-500">
+            <p className="font-mono text-[11px] tracking-wider text-stone-500">
               Drag & drop photos or videos, or{" "}
               <button
                 type="button"
@@ -118,7 +118,7 @@ export function MediaUploader({
                 browse
               </button>
             </p>
-            <p className="font-mono-dm text-[10px] tracking-widest text-amber-400 uppercase">
+            <p className="font-mono text-[10px] tracking-widest text-amber-400 uppercase">
               {mediaUrls.length} / {maxFiles} files
             </p>
           </div>
@@ -148,11 +148,11 @@ export function MediaUploader({
                 onClick={() => removeMedia(index)}
                 className="absolute inset-0 flex items-center justify-center bg-stone-900/60 opacity-0 transition-opacity group-hover:opacity-100"
               >
-                <span className="font-mono-dm text-[10px] tracking-widest text-red-300 uppercase">
+                <span className="font-mono text-[10px] tracking-widest text-red-300 uppercase">
                   Remove
                 </span>
               </button>
-              <span className="font-mono-dm absolute bottom-1 left-1 bg-stone-900/70 px-1 text-[9px] text-amber-200">
+              <span className="font-mono absolute bottom-1 left-1 bg-stone-900/70 px-1 text-[9px] text-amber-200">
                 {String(index + 1).padStart(2, "0")}
               </span>
             </div>
@@ -220,7 +220,7 @@ export function MediaGallery({
                 </span>
               </div>
             )}
-            <span className="font-mono-dm absolute bottom-1 left-1 bg-stone-900/70 px-1 text-[9px] text-amber-200">
+            <span className="font-mono absolute bottom-1 left-1 bg-stone-900/70 px-1 text-[9px] text-amber-200">
               {String(index + 1).padStart(2, "0")}
             </span>
           </button>
@@ -233,17 +233,17 @@ export function MediaGallery({
           onClick={() => setSelectedIndex(null)}
         >
           <div className="absolute top-0 right-0 left-0 flex items-center justify-between border-b border-stone-800 px-4 py-3 sm:px-6">
-            <span className="font-mono-dm text-[10px] tracking-widest text-amber-600 uppercase">
+            <span className="font-mono text-[10px] tracking-widest text-amber-600 uppercase">
               LankanBook · Evidence
             </span>
             <div className="flex items-center gap-4">
-              <span className="font-mono-dm text-[10px] tracking-widest text-stone-500">
+              <span className="font-mono text-[10px] tracking-widest text-stone-500">
                 {selectedIndex + 1} / {parsed.length}
               </span>
               <button
                 type="button"
                 onClick={() => setSelectedIndex(null)}
-                className="font-mono-dm text-[10px] tracking-widest text-stone-400 uppercase transition-colors hover:text-amber-400"
+                className="font-mono text-[10px] tracking-widest text-stone-400 uppercase transition-colors hover:text-amber-400"
               >
                 Close ×
               </button>
@@ -253,7 +253,7 @@ export function MediaGallery({
           <button
             type="button"
             onClick={prev}
-            className="font-mono-dm absolute left-3 z-10 px-2 py-4 text-2xl text-stone-400 transition-colors hover:text-amber-400 sm:left-6"
+            className="font-mono absolute left-3 z-10 px-2 py-4 text-2xl text-stone-400 transition-colors hover:text-amber-400 sm:left-6"
           >
             ‹
           </button>
@@ -281,7 +281,7 @@ export function MediaGallery({
           <button
             type="button"
             onClick={next}
-            className="font-mono-dm absolute right-3 z-10 px-2 py-4 text-2xl text-stone-400 transition-colors hover:text-amber-400 sm:right-6"
+            className="font-mono absolute right-3 z-10 px-2 py-4 text-2xl text-stone-400 transition-colors hover:text-amber-400 sm:right-6"
           >
             ›
           </button>
