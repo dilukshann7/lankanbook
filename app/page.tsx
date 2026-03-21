@@ -67,11 +67,10 @@ function Dropdown({ label, options, value, onChange }: DropdownProps) {
                 onChange(opt.value)
                 setOpen(false)
               }}
-              className={`block w-full border-b border-amber-100 px-4 py-2.5 text-left font-mono text-xs tracking-wider transition-colors last:border-b-0 ${
-                value === opt.value
-                  ? "bg-stone-900 text-amber-200"
-                  : "text-stone-600 hover:bg-amber-50 hover:text-stone-900"
-              }`}
+              className={`block w-full border-b border-amber-100 px-4 py-2.5 text-left font-mono text-xs tracking-wider transition-colors last:border-b-0 ${value === opt.value
+                ? "bg-stone-900 text-amber-200"
+                : "text-stone-600 hover:bg-amber-50 hover:text-stone-900"
+                }`}
             >
               {opt.label}
             </button>
@@ -197,18 +196,6 @@ export default function HomePage() {
                 </span>{" "}
                 establishments
               </span>
-              <span>
-                <span className="font-medium text-amber-300">
-                  {totalReports}
-                </span>{" "}
-                community reports
-              </span>
-              <span>
-                <span className="font-medium text-amber-300">
-                  {provinceCount}
-                </span>{" "}
-                provinces
-              </span>
             </div>
             <Link
               href="/submit"
@@ -220,26 +207,9 @@ export default function HomePage() {
         </div>
       </header>
 
-      <div className="border-b border-amber-300 bg-amber-100">
-        <div className="mx-auto flex max-w-5xl items-start gap-3 px-4 py-4 sm:px-6">
-          <span className="mt-0.5 flex-shrink-0 text-xl">⚖️</span>
-          <div>
-            <h2 className="mb-1 font-sans text-sm font-bold">
-              A Modern Green Book for Sri Lanka
-            </h2>
-            <p className="text-xs leading-relaxed text-stone-600 italic">
-              Like the Negro Motorist Green Book, this project documents
-              establishments with dual standards — charging locals more, denying
-              entry, or otherwise discriminating against Sri Lankan residents.
-              Upvote reports to help verify authenticity.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="border-b-2 border-stone-900">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-3.5 sm:px-6">
-          <div className="relative min-w-44 flex-1">
+          <div className="relative min-w-full flex-1 md:min-w-44">
             <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-amber-600 select-none">
               ⌕
             </span>
@@ -333,7 +303,7 @@ export default function HomePage() {
                 </p>
                 {est.description && (
                   <p className="line-clamp-2 text-sm leading-relaxed text-stone-500 italic">
-                    &ldquo;{est.description}&rdquo;
+                    {est.description}
                   </p>
                 )}
                 <p className="mt-2.5 font-mono text-[10px] tracking-wider text-stone-400">
@@ -347,7 +317,7 @@ export default function HomePage() {
               </div>
 
               <div
-                className={`flex min-w-[60px] flex-shrink-0 flex-col items-center justify-center px-3 py-2 ${est.upvotes >= 100 ? "bg-red-700 text-white" : "bg-stone-900 text-amber-50"}`}
+                className={`flex min-w-15 shrink-0 flex-col items-center justify-center px-3 py-2 ${est.upvotes >= 100 ? "bg-red-700 text-white" : "bg-stone-900 text-amber-50"}`}
               >
                 <span className="font-sans text-2xl leading-none font-black">
                   {est.upvotes}

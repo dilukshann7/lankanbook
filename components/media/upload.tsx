@@ -73,13 +73,12 @@ export function MediaUploader({
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
-        className={`relative border-2 border-dashed p-6 text-center transition-colors ${
-          dragActive
-            ? "border-amber-500 bg-amber-50"
-            : atLimit
-              ? "cursor-not-allowed border-stone-200 bg-stone-50 opacity-60"
-              : "border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50/50"
-        }`}
+        className={`relative border-2 border-dashed p-6 text-center transition-colors ${dragActive
+          ? "border-amber-500 bg-amber-50"
+          : atLimit
+            ? "cursor-not-allowed border-stone-200 bg-stone-50 opacity-60"
+            : "border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50/50"
+          }`}
       >
         <input
           ref={inputRef}

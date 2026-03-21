@@ -34,12 +34,12 @@ export default function SubmitPage() {
 
   const set =
     (k: string) =>
-    (
-      e: React.ChangeEvent<
-        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-      >
-    ) =>
-      setFormData((f) => ({ ...f, [k]: e.target.value }))
+      (
+        e: React.ChangeEvent<
+          HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+        >
+      ) =>
+        setFormData((f) => ({ ...f, [k]: e.target.value }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -186,7 +186,7 @@ export default function SubmitPage() {
             </div>
 
             <div className="flex gap-3 border-l-2 border-amber-500 bg-amber-100 px-4 py-3">
-              <span className="mt-0.5 flex-shrink-0 text-base text-amber-600">
+              <span className="mt-0.5 shrink-0 text-base text-amber-600">
                 ⚠
               </span>
               <p className="text-xs leading-relaxed text-stone-600 italic">
@@ -234,7 +234,7 @@ export default function SubmitPage() {
                     key={i}
                     className="flex gap-2 text-xs leading-relaxed text-stone-600"
                   >
-                    <span className="mt-0.5 flex-shrink-0 font-mono text-amber-500">
+                    <span className="mt-0.5 shrink-0 font-mono text-amber-500">
                       ›
                     </span>
                     <span className="italic">{item}</span>
@@ -258,7 +258,7 @@ export default function SubmitPage() {
                     key={i}
                     className="flex gap-2 text-xs leading-relaxed text-stone-400"
                   >
-                    <span className="mt-0.5 flex-shrink-0 font-mono text-amber-600">
+                    <span className="mt-0.5 shrink-0 font-mono text-amber-600">
                       {i + 1}.
                     </span>
                     <span className="italic">{tip}</span>

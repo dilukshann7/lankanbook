@@ -156,11 +156,10 @@ export default function EstablishmentPage() {
               <button
                 onClick={handleUpvote}
                 disabled={userHasUpvoted}
-                className={`flex items-center gap-2 border px-4 py-2 font-mono text-xs tracking-widest uppercase transition-colors ${
-                  userHasUpvoted
-                    ? "cursor-default border-red-700 bg-red-700 text-white"
-                    : "border-amber-600/50 text-amber-400 hover:border-red-600 hover:text-red-400"
-                }`}
+                className={`flex items-center gap-2 border px-4 py-2 font-mono text-xs tracking-widest uppercase transition-colors ${userHasUpvoted
+                  ? "cursor-default border-red-700 bg-red-700 text-white"
+                  : "border-amber-600/50 text-amber-400 hover:border-red-600 hover:text-red-400"
+                  }`}
               >
                 <span>{userHasUpvoted ? "✓" : "▲"}</span>
                 <span>
@@ -194,8 +193,8 @@ export default function EstablishmentPage() {
                   </span>
                 </div>
                 <div className="border border-amber-200 bg-amber-100 p-5">
-                  <p className="text-sm leading-relaxed text-stone-700 italic">
-                    &ldquo;{establishment.description}&rdquo;
+                  <p className="text-sm leading-relaxed font-bold text-stone-700">
+                    {establishment.description}
                   </p>
                   {estMedia.length > 0 && (
                     <div className="mt-4">
@@ -254,7 +253,7 @@ export default function EstablishmentPage() {
                         className="border-b border-amber-200 pb-5"
                       >
                         <div className="flex gap-4">
-                          <span className="hidden w-5 flex-shrink-0 pt-0.5 font-mono text-xs text-amber-300 sm:block">
+                          <span className="hidden w-5 shrink-0 pt-0.5 font-mono text-xs text-amber-300 sm:block">
                             {String(i + 1).padStart(2, "0")}
                           </span>
                           <div className="min-w-0 flex-1">
