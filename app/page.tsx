@@ -99,6 +99,8 @@ export default function HomePage() {
   const [province, setProvince] = useState("")
   const [sort, setSort] = useState("newest")
   const [loading, setLoading] = useState(true)
+  const [page, setPage] = useState(1)
+  const ITEMS_PER_PAGE = 10
 
   useEffect(() => {
     fetch("/api/establishments")
@@ -109,6 +111,10 @@ export default function HomePage() {
       })
       .catch(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [page])
 
   const provinceOptions = [
     { value: "", label: "All Provinces" },
@@ -130,8 +136,26 @@ export default function HomePage() {
           : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     )
 
-  const totalReports = establishments.reduce((s, e) => s + e.upvotes, 0)
-  const provinceCount = new Set(establishments.map((e) => e.province)).size
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const paginated = filtered.slice(
+    (page - 1) * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE
+  )
+
+  const handleSetSearch = (value: string) => {
+    setSearch(value)
+    setPage(1)
+  }
+
+  const handleSetProvince = (value: string) => {
+    setProvince(value)
+    setPage(1)
+  }
+
+  const handleSetSort = (value: string) => {
+    setSort(value)
+    setPage(1)
+  }
 
   const today = new Date().toLocaleDateString("en-LK", {
     weekday: "long",
@@ -223,7 +247,7 @@ export default function HomePage() {
               className="w-full border border-amber-200 bg-white py-2 pr-3 pl-8 font-sans text-sm text-stone-700 italic transition-colors placeholder:text-amber-400/80 focus:border-amber-500 focus:outline-none"
               placeholder="Search by name or location…"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSetSearch(e.target.value)}
             />
           </div>
 
@@ -231,13 +255,13 @@ export default function HomePage() {
             label="All Provinces"
             options={provinceOptions}
             value={province}
-            onChange={setProvince}
+            onChange={handleSetProvince}
           />
           <Dropdown
             label="Sort"
             options={SORT_OPTIONS}
             value={sort}
-            onChange={setSort}
+            onChange={handleSetSort}
           />
         </div>
       </div>
@@ -287,14 +311,14 @@ export default function HomePage() {
         )}
 
         {!loading &&
-          filtered.map((est, i) => (
+          paginated.map((est, i) => (
             <Link
               key={est.id}
               href={`/establishment/${est.id}`}
               className="group -mx-4 flex items-start gap-4 border-b border-amber-200 px-4 py-5 transition-colors hover:bg-amber-100/70 sm:-mx-6 sm:px-6"
             >
-              <span className="hidden w-6 flex-shrink-0 pt-1.5 font-mono text-[11px] text-amber-300 select-none sm:block">
-                {String(i + 1).padStart(2, "0")}
+              <span className="hidden w-6 shrink-0 pt-1.5 font-mono text-[11px] text-amber-300 select-none sm:block">
+                {String((page - 1) * ITEMS_PER_PAGE + i + 1).padStart(2, "0")}
               </span>
 
               <div className="min-w-0 flex-1">
@@ -338,6 +362,48 @@ export default function HomePage() {
               </span>
             </Link>
           ))}
+
+        {!loading && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-8">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="border border-amber-200 px-4 py-2 font-mono text-xs tracking-wider text-stone-600 uppercase transition-colors hover:border-amber-400 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              ← Prev
+            </button>
+            <div className="flex gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                let pageNum: number
+                if (totalPages <= 5) {
+                  pageNum = i + 1
+                } else if (page <= 3) {
+                  pageNum = i + 1
+                } else if (page >= totalPages - 2) {
+                  pageNum = totalPages - 4 + i
+                } else {
+                  pageNum = page - 2 + i
+                }
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => setPage(pageNum)}
+                    className={`h-9 w-9 font-mono text-sm ${page === pageNum ? "bg-stone-900 text-amber-50" : "text-stone-600 hover:bg-amber-100"}`}
+                  >
+                    {pageNum}
+                  </button>
+                )
+              })}
+            </div>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="border border-amber-200 px-4 py-2 font-mono text-xs tracking-wider text-stone-600 uppercase transition-colors hover:border-amber-400 hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Next →
+            </button>
+          </div>
+        )}
       </main>
 
       <SiteFooter />
