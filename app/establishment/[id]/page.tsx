@@ -206,6 +206,25 @@ export default function EstablishmentPage() {
               </div>
             )}
 
+            <div className="border border-amber-200 bg-white p-4">
+              <div className="mb-4 flex items-baseline gap-3 border-b-2 border-stone-900 pb-2">
+                <h2 className="font-sans text-xl font-bold">Location</h2>
+                <span className="font-mono text-[10px] tracking-widest text-amber-600 uppercase">
+                  Google Maps
+                </span>
+              </div>
+              <iframe
+                title={`Map of ${establishment.name}`}
+                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&q=${encodeURIComponent(establishment.name + ", " + establishment.location + ", " + establishment.province + ", Sri Lanka")}`}
+                width="100%"
+                height="300"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="bg-amber-100"
+              />
+            </div>
+
             <div>
               <div className="mb-4 flex items-baseline gap-3 border-b-2 border-stone-900 pb-2">
                 <h2 className="font-sans text-xl font-bold">
