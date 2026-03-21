@@ -1,19 +1,39 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-const rateLimit = new Map<string, { count: number; timestamp: number }>()
+interface RateLimitRecord {
+  count: number
+  timestamp: number
+}
+
+const rateLimit = new Map<string, RateLimitRecord>()
 const RATE_LIMIT_WINDOW = 60 * 1000
-const MAX_REQUESTS = 100
+const MAX_GET_REQUESTS = 100
+const MAX_MUTATE_REQUESTS = 30
+const CLEANUP_INTERVAL = 5 * 60 * 1000
+
+let lastCleanup = Date.now()
+
+function cleanupStaleEntries() {
+  const now = Date.now()
+  if (now - lastCleanup < CLEANUP_INTERVAL) return
+  lastCleanup = now
+  for (const [key, record] of rateLimit.entries()) {
+    if (now - record.timestamp > RATE_LIMIT_WINDOW) {
+      rateLimit.delete(key)
+    }
+  }
+}
 
 function getRateLimitKey(request: NextRequest): string {
   const forwarded = request.headers.get("x-forwarded-for")
   const ip = forwarded
     ? forwarded.split(",")[0].trim()
     : (request.headers.get("x-real-ip") ?? "unknown")
-  return ip
+  return `${ip}:${request.method}`
 }
 
-function isRateLimited(key: string): boolean {
+function isRateLimited(key: string, maxRequests: number): boolean {
   const now = Date.now()
   const record = rateLimit.get(key)
 
@@ -27,7 +47,7 @@ function isRateLimited(key: string): boolean {
     return false
   }
 
-  if (record.count >= MAX_REQUESTS) {
+  if (record.count >= maxRequests) {
     return true
   }
 
@@ -36,24 +56,31 @@ function isRateLimited(key: string): boolean {
 }
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+  cleanupStaleEntries()
 
-  if (
+  const key = getRateLimitKey(request)
+  const isMutating =
     request.method === "POST" ||
     request.method === "PUT" ||
     request.method === "DELETE"
-  ) {
-    const key = getRateLimitKey(request)
+  const maxRequests = isMutating ? MAX_MUTATE_REQUESTS : MAX_GET_REQUESTS
 
-    if (isRateLimited(key)) {
-      return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
-        { status: 429 }
-      )
-    }
+  if (isRateLimited(key, maxRequests)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": "60",
+        },
+      }
+    )
   }
 
+  const response = NextResponse.next()
   response.headers.set("X-Request-ID", crypto.randomUUID())
+  response.headers.set("X-Content-Type-Options", "nosniff")
+  response.headers.set("X-Frame-Options", "SAMEORIGIN")
 
   return response
 }
