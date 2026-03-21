@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { establishmentsTable } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { sql } from "drizzle-orm"
+import { isValidPositiveInteger } from "@/lib/validation"
 
 export async function POST(
   request: Request,
@@ -10,6 +11,14 @@ export async function POST(
 ) {
   try {
     const { id } = await params
+
+    if (!isValidPositiveInteger(id)) {
+      return NextResponse.json(
+        { error: "Invalid establishment ID." },
+        { status: 400 }
+      )
+    }
+
     const updated = await db
       .update(establishmentsTable)
       .set({ upvotes: sql`${establishmentsTable.upvotes} + 1` })

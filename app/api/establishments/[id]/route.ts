@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { establishmentsTable } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
+import { isValidPositiveInteger } from "@/lib/validation"
 
 export async function GET(
   request: Request,
@@ -9,6 +10,14 @@ export async function GET(
 ) {
   try {
     const { id } = await params
+
+    if (!isValidPositiveInteger(id)) {
+      return NextResponse.json(
+        { error: "Invalid establishment ID." },
+        { status: 400 }
+      )
+    }
+
     const establishment = await db
       .select()
       .from(establishmentsTable)

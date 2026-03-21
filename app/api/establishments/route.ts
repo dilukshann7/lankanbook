@@ -2,6 +2,11 @@ import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { establishmentsTable } from "@/lib/db/schema"
 import { desc } from "drizzle-orm"
+import {
+  sanitizeString,
+  isValidProvince,
+  isValidMediaUrls,
+} from "@/lib/validation"
 
 export async function GET() {
   try {
@@ -22,11 +27,31 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, location, province, description, mediaUrls } = body
+    const { name: rawName, location: rawLocation, province: rawProvince, description: rawDescription, mediaUrls } = body
+
+    const name = sanitizeString(rawName, 255)
+    const location = sanitizeString(rawLocation, 255)
+    const province = sanitizeString(rawProvince, 100)
+    const description = sanitizeString(rawDescription, 5000)
 
     if (!name || !location || !province) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required fields: name, location, and province are required." },
+        { status: 400 }
+      )
+    }
+
+    if (!isValidProvince(province)) {
+      return NextResponse.json(
+        { error: "Invalid province. Please select a valid Sri Lankan province." },
+        { status: 400 }
+      )
+    }
+
+    const urls = mediaUrls || []
+    if (!isValidMediaUrls(urls)) {
+      return NextResponse.json(
+        { error: "Invalid media URLs provided." },
         { status: 400 }
       )
     }
@@ -38,7 +63,7 @@ export async function POST(request: Request) {
         location,
         province,
         description,
-        mediaUrls: JSON.stringify(mediaUrls || []),
+        mediaUrls: JSON.stringify(urls),
       })
       .returning()
 
