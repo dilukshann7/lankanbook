@@ -78,7 +78,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={cn("antialiased", inter.variable, "font-sans")}
     >
-      <body>
+      <body className="flex min-h-screen flex-col">
         <ThemeProvider>{children}</ThemeProvider>
         <Analytics />
       </body>
