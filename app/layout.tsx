@@ -1,5 +1,5 @@
 import { Inter } from "next/font/google"
-import { Metadata } from "next"
+import { Metadata, Viewport } from "next"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -7,6 +7,16 @@ import { cn } from "@/lib/utils"
 import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#fffbeb" },
+    { media: "(prefers-color-scheme: dark)", color: "#1c1917" },
+  ],
+}
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://lankanbook.vercel.app"),
